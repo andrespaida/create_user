@@ -1,0 +1,41 @@
+name: Deploy CREATE_USER to EC2 (Ubuntu)
+
+on:
+  push:
+    branches:
+      - qa
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
+
+      - name: Copy project to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} "
+            mkdir -p ~/create-user"
+          scp -r ./* ubuntu@${{ secrets.EC2_HOST }}:~/create-user
+
+      - name: Crear archivo .env en EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << EOF
+            echo "${{ secrets.ENV_FILE }}" > ~/create-user/.env
+          EOF
+
+      - name: Build and run Docker container
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+            cd ~/create-user
+            sudo docker stop create-user || true
+            sudo docker rm create-user || true
+            sudo docker build --no-cache -t create-user .
+            sudo docker run -d --name create-user -p 3002:3002 create-user
+          EOF

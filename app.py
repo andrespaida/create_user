@@ -3,9 +3,11 @@ from flask_cors import CORS
 from routes import routes
 
 app = Flask(__name__)
-CORS(app)  # 👈 Habilita CORS para todos los dominios
+
+# Habilita CORS para todas las rutas y dominios (puedes ajustar origins más adelante)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 app.register_blueprint(routes)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=3002)
