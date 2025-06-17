@@ -33,9 +33,32 @@ jobs:
       - name: Build and run Docker container
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << 'EOF'
+
+            # Instalar Docker si no está
+            if ! command -v docker &> /dev/null; then
+              echo "🔧 Instalando Docker..."
+              sudo apt update
+              sudo apt install -y docker.io
+              sudo systemctl enable docker
+              sudo systemctl start docker
+              sudo usermod -aG docker \$USER
+            else
+              echo "✅ Docker ya está instalado."
+            fi
+
             cd ~/create-user
-            sudo docker stop create-user || true
-            sudo docker rm create-user || true
+
+            # Eliminar contenedor anterior si existe
+            sudo docker rm -f create-user || true
+
+            # Construir la imagen desde cero
             sudo docker build --no-cache -t create-user .
-            sudo docker run -d --name create-user -p 3002:3002 create-user
+
+            # Ejecutar contenedor con reinicio automático y .env
+            sudo docker run -d \
+              --name create-user \
+              --env-file .env \
+              -p 3002:3002 \
+              --restart always \
+              create-user
           EOF
