@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from db import get_db_connection
 from models import create_user
 from utils import hash_password, verify_token
-import jwt  # ⬅️ Necesario para capturar excepciones correctamente
+import jwt
 
 routes = Blueprint('routes', __name__)
 
@@ -13,15 +13,14 @@ def create_user_route():
     if not data:
         return jsonify({"error": "Missing JSON body"}), 400
 
-    name = data.get('name', '')  # Por si se usa en futuro, aunque no esté en frontend aún
+    name = data.get('name', '')
     email = data.get('email')
     password = data.get('password')
-    role = data.get('role', 'user')  # 'user' por defecto
+    role = data.get('role', 'user')
 
     if not email or not password:
         return jsonify({"error": "Missing email or password"}), 400
 
-    # ⚠️ Validar si se intenta crear admin
     if role == 'admin':
         auth_header = request.headers.get('Authorization')
         if not auth_header or not auth_header.startswith("Bearer "):

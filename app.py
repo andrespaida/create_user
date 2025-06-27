@@ -4,7 +4,6 @@ from routes import routes
 
 app = Flask(__name__)
 
-# Habilita CORS para todas las rutas y dominios (puedes ajustar origins más adelante)
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 
 app.register_blueprint(routes)
