@@ -1,6 +1,6 @@
 # Create User Microservice
 
-This microservice handles the registration of new users in the ToyShop platform. It connects to a PostgreSQL database and stores user data securely, including password hashing.
+This microservice handles the registration of new users in the ToyShop platform. It connects to a PostgreSQL database and stores user data securely, including password hashing..
 
 ## Technologies Used
 
