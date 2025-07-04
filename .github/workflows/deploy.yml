@@ -1,16 +1,16 @@
-name: Build and Deploy create-user to EC2 from QA
+name: Build and Deploy create-user to EC2
 
 on:
   push:
     branches:
-      - qa
+      - main
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     env:
-      IMAGE_TAG: qa
+      IMAGE_TAG: latest
 
     steps:
       - name: Checkout repo
@@ -30,7 +30,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.EC2_SSH_KEY }}
 
-      - name: Deploy container on EC2 from Docker Hub (qa tag)
+      - name: Deploy container on EC2 from Docker Hub (latest tag)
         run: |
           ssh -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_HOST }} << EOF
 
